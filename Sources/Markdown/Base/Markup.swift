@@ -95,6 +95,12 @@ public protocol Markup {
     /// - returns: The result of the visit.
     func accept<V: MarkupVisitor>(_ visitor: inout V) -> V.Result
 
+    /// Accept an `AsyncMarkupVisitor` and call the specific visitation method for this element asynchronously.
+    ///
+    /// - parameter visitor: The `AsyncMarkupVisitor` visiting the element.
+    /// - returns: The result of the visit.
+    func acceptAsync<V: AsyncMarkupVisitor>(_ visitor: V) async -> V.Result
+
     /// The data backing the markup element.
     /// > Note: This property is an implementation detail; do not use it directly.
     var _data: _MarkupData { get set }

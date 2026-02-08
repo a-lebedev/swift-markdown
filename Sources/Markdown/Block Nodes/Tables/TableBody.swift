@@ -78,4 +78,8 @@ public extension Table.Body {
     func accept<V>(_ visitor: inout V) -> V.Result where V : MarkupVisitor {
         return visitor.visitTableBody(self)
     }
+
+    func acceptAsync<V: AsyncMarkupVisitor>(_ visitor: V) async -> V.Result {
+        return await visitor.visitTableBody(self)
+    }
 }

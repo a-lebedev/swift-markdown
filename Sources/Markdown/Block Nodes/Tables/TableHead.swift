@@ -41,4 +41,8 @@ public extension Table.Head {
     func accept<V>(_ visitor: inout V) -> V.Result where V : MarkupVisitor {
         return visitor.visitTableHead(self)
     }
+
+    func acceptAsync<V: AsyncMarkupVisitor>(_ visitor: V) async -> V.Result {
+        return await visitor.visitTableHead(self)
+    }
 }

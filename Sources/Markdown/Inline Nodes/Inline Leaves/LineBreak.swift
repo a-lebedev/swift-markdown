@@ -44,4 +44,8 @@ public extension LineBreak {
     func accept<V: MarkupVisitor>(_ visitor: inout V) -> V.Result {
         return visitor.visitLineBreak(self)
     }
+
+    func acceptAsync<V: AsyncMarkupVisitor>(_ visitor: V) async -> V.Result {
+        return await visitor.visitLineBreak(self)
+    }
 }

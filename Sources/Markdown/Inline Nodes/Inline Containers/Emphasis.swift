@@ -53,4 +53,8 @@ public extension Emphasis {
     func accept<V: MarkupVisitor>(_ visitor: inout V) -> V.Result {
         return visitor.visitEmphasis(self)
     }
+
+    func acceptAsync<V: AsyncMarkupVisitor>(_ visitor: V) async -> V.Result {
+        return await visitor.visitEmphasis(self)
+    }
 }

@@ -44,4 +44,8 @@ public extension Table.Row {
     func accept<V>(_ visitor: inout V) -> V.Result where V : MarkupVisitor {
         return visitor.visitTableRow(self)
     }
+
+    func acceptAsync<V: AsyncMarkupVisitor>(_ visitor: V) async -> V.Result {
+        return await visitor.visitTableRow(self)
+    }
 }

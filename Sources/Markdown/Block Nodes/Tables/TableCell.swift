@@ -89,4 +89,8 @@ public extension Table.Cell {
     func accept<V>(_ visitor: inout V) -> V.Result where V : MarkupVisitor {
         return visitor.visitTableCell(self)
     }
+
+    func acceptAsync<V: AsyncMarkupVisitor>(_ visitor: V) async -> V.Result {
+        return await visitor.visitTableCell(self)
+    }
 }

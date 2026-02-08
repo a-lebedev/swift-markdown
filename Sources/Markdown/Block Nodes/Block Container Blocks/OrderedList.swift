@@ -57,4 +57,8 @@ public extension OrderedList {
     func accept<V: MarkupVisitor>(_ visitor: inout V) -> V.Result {
         return visitor.visitOrderedList(self)
     }
+
+    func acceptAsync<V: AsyncMarkupVisitor>(_ visitor: V) async -> V.Result {
+        return await visitor.visitOrderedList(self)
+    }
 }

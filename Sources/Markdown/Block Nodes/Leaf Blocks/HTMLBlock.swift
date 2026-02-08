@@ -49,4 +49,8 @@ public extension HTMLBlock {
     func accept<V: MarkupVisitor>(_ visitor: inout V) -> V.Result {
         return visitor.visitHTMLBlock(self)
     }
+
+    func acceptAsync<V: AsyncMarkupVisitor>(_ visitor: V) async -> V.Result {
+        return await visitor.visitHTMLBlock(self)
+    }
 }

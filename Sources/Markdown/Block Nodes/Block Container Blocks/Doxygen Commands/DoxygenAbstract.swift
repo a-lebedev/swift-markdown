@@ -37,6 +37,10 @@ public struct DoxygenAbstract: BlockContainer {
     public func accept<V: MarkupVisitor>(_ visitor: inout V) -> V.Result {
         return visitor.visitDoxygenAbstract(self)
     }
+
+    public func acceptAsync<V: AsyncMarkupVisitor>(_ visitor: V) async -> V.Result {
+        return await visitor.visitDoxygenAbstract(self)
+    }
 }
 
 public extension DoxygenAbstract {
