@@ -44,4 +44,8 @@ public extension SoftBreak {
     func accept<V: MarkupVisitor>(_ visitor: inout V) -> V.Result {
         return visitor.visitSoftBreak(self)
     }
+
+    func acceptAsync<V: AsyncMarkupVisitor>(_ visitor: V) async -> V.Result {
+        return await visitor.visitSoftBreak(self)
+    }
 }

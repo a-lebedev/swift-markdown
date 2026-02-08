@@ -51,4 +51,8 @@ public extension CustomInline {
     func accept<V: MarkupVisitor>(_ visitor: inout V) -> V.Result {
         return visitor.visitCustomInline(self)
     }
+
+    func acceptAsync<V: AsyncMarkupVisitor>(_ visitor: V) async -> V.Result {
+        return await visitor.visitCustomInline(self)
+    }
 }

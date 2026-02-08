@@ -55,4 +55,8 @@ public extension InlineHTML {
     func accept<V: MarkupVisitor>(_ visitor: inout V) -> V.Result {
         return visitor.visitInlineHTML(self)
     }
+
+    func acceptAsync<V: AsyncMarkupVisitor>(_ visitor: V) async -> V.Result {
+        return await visitor.visitInlineHTML(self)
+    }
 }

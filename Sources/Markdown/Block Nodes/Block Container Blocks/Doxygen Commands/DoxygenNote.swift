@@ -37,6 +37,10 @@ public struct DoxygenNote: BlockContainer {
     public func accept<V: MarkupVisitor>(_ visitor: inout V) -> V.Result {
         return visitor.visitDoxygenNote(self)
     }
+
+    public func acceptAsync<V: AsyncMarkupVisitor>(_ visitor: V) async -> V.Result {
+        return await visitor.visitDoxygenNote(self)
+    }
 }
 
 public extension DoxygenNote {

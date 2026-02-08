@@ -63,6 +63,10 @@ public extension SymbolLink {
         return visitor.visitSymbolLink(self)
     }
 
+    func acceptAsync<V: AsyncMarkupVisitor>(_ visitor: V) async -> V.Result {
+        return await visitor.visitSymbolLink(self)
+    }
+
     // MARK: PlainTextConvertibleMarkup
 
     var plainText: String {

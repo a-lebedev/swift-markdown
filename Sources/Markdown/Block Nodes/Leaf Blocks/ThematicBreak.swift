@@ -36,4 +36,8 @@ public extension ThematicBreak {
     func accept<V: MarkupVisitor>(_ visitor: inout V) -> V.Result {
         return visitor.visitThematicBreak(self)
     }
+
+    func acceptAsync<V: AsyncMarkupVisitor>(_ visitor: V) async -> V.Result {
+        return await visitor.visitThematicBreak(self)
+    }
 }

@@ -56,4 +56,8 @@ public extension InlineAttributes {
     func accept<V: MarkupVisitor>(_ visitor: inout V) -> V.Result {
         return visitor.visitInlineAttributes(self)
     }
+
+    func acceptAsync<V: AsyncMarkupVisitor>(_ visitor: V) async -> V.Result {
+        return await visitor.visitInlineAttributes(self)
+    }
 }

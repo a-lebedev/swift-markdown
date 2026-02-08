@@ -121,6 +121,10 @@ public extension Table {
     func accept<V>(_ visitor: inout V) -> V.Result where V : MarkupVisitor {
         return visitor.visitTable(self)
     }
+
+    func acceptAsync<V: AsyncMarkupVisitor>(_ visitor: V) async -> V.Result {
+        return await visitor.visitTable(self)
+    }
 }
 
 fileprivate extension Array where Element == Table.ColumnAlignment? {

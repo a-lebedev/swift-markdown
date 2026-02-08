@@ -429,3 +429,355 @@ extension MarkupVisitor {
         return defaultVisit(doxygenReturns)
     }
 }
+
+// MARK: - Async Markup Visitor
+
+/// Visits `Markup` elements asynchronously and returns a result.
+///
+/// Use `AsyncMarkupVisitor` when you need to perform asynchronous operations during tree traversal,
+/// such as network calls, file I/O, accessing `@MainActor`-isolated APIs, or expensive computations
+/// that benefit from cooperative cancellation.
+///
+/// - note: This interface only provides requirements for visiting each kind of element. It does not require each visit method to descend into child elements.
+///
+/// Generally, ``AsyncMarkupWalker`` is best for walking a ``Markup`` tree asynchronously if the ``Result`` type is `Void`,
+/// or ``AsyncMarkupRewriter`` for recursively changing a tree's structure with async operations.
+public protocol AsyncMarkupVisitor<Result> {
+
+    /// The result type returned when visiting an element.
+    associatedtype Result
+
+    /// A default implementation to use when a visitor method isn't implemented for a particular element.
+    /// - parameter markup: the element to visit.
+    /// - returns: The result of the visit.
+    func defaultVisit(_ markup: Markup) async -> Result
+
+    /// Visit any kind of `Markup` element and return the result.
+    /// - parameter markup: Any kind of `Markup` element.
+    /// - returns: The result of the visit.
+    func visit(_ markup: Markup) async -> Result
+
+    /// Visit a `BlockQuote` element and return the result.
+    /// - parameter blockQuote: A `BlockQuote` element.
+    /// - returns: The result of the visit.
+    func visitBlockQuote(_ blockQuote: BlockQuote) async -> Result
+
+    /// Visit a `CodeBlock` element and return the result.
+    /// - parameter codeBlock: A `CodeBlock` element.
+    /// - returns: The result of the visit.
+    func visitCodeBlock(_ codeBlock: CodeBlock) async -> Result
+
+    /// Visit a `CustomBlock` element and return the result.
+    /// - parameter customBlock: A `CustomBlock` element.
+    /// - returns: The result of the visit.
+    func visitCustomBlock(_ customBlock: CustomBlock) async -> Result
+
+    /// Visit a `Document` element and return the result.
+    /// - parameter document: A `Document` element.
+    /// - returns: The result of the visit.
+    func visitDocument(_ document: Document) async -> Result
+
+    /// Visit a `Heading` element and return the result.
+    /// - parameter heading: A `Heading` element.
+    /// - returns: The result of the visit.
+    func visitHeading(_ heading: Heading) async -> Result
+
+    /// Visit a `ThematicBreak` element and return the result.
+    /// - parameter thematicBreak: A `ThematicBreak` element.
+    /// - returns: The result of the visit.
+    func visitThematicBreak(_ thematicBreak: ThematicBreak) async -> Result
+
+    /// Visit an `HTMLBlock` element and return the result.
+    /// - parameter html: An `HTMLBlock` element.
+    /// - returns: The result of the visit.
+    func visitHTMLBlock(_ html: HTMLBlock) async -> Result
+
+    /// Visit a `ListItem` element and return the result.
+    /// - parameter listItem: A `ListItem` element.
+    /// - returns: The result of the visit.
+    func visitListItem(_ listItem: ListItem) async -> Result
+
+    /// Visit an `OrderedList` element and return the result.
+    /// - parameter orderedList: An `OrderedList` element.
+    /// - returns: The result of the visit.
+    func visitOrderedList(_ orderedList: OrderedList) async -> Result
+
+    /// Visit an `UnorderedList` element and return the result.
+    /// - parameter unorderedList: An `UnorderedList` element.
+    /// - returns: The result of the visit.
+    func visitUnorderedList(_ unorderedList: UnorderedList) async -> Result
+
+    /// Visit a `Paragraph` element and return the result.
+    /// - parameter paragraph: A `Paragraph` element.
+    /// - returns: The result of the visit.
+    func visitParagraph(_ paragraph: Paragraph) async -> Result
+
+    /// Visit a `BlockDirective` element and return the result.
+    /// - parameter blockDirective: A `BlockDirective` element.
+    /// - returns: The result of the visit.
+    func visitBlockDirective(_ blockDirective: BlockDirective) async -> Result
+
+    /// Visit an `InlineCode` element and return the result.
+    /// - parameter inlineCode: An `InlineCode` element.
+    /// - returns: The result of the visit.
+    func visitInlineCode(_ inlineCode: InlineCode) async -> Result
+
+    /// Visit a `CustomInline` element and return the result.
+    /// - parameter customInline: A `CustomInline` element.
+    /// - returns: The result of the visit.
+    func visitCustomInline(_ customInline: CustomInline) async -> Result
+
+    /// Visit an `Emphasis` element and return the result.
+    /// - parameter emphasis: An `Emphasis` element.
+    /// - returns: The result of the visit.
+    func visitEmphasis(_ emphasis: Emphasis) async -> Result
+
+    /// Visit an `Image` element and return the result.
+    /// - parameter image: An `Image` element.
+    /// - returns: The result of the visit.
+    func visitImage(_ image: Image) async -> Result
+
+    /// Visit an `InlineHTML` element and return the result.
+    /// - parameter inlineHTML: An `InlineHTML` element.
+    /// - returns: The result of the visit.
+    func visitInlineHTML(_ inlineHTML: InlineHTML) async -> Result
+
+    /// Visit a `LineBreak` element and return the result.
+    /// - parameter lineBreak: A `LineBreak` element.
+    /// - returns: The result of the visit.
+    func visitLineBreak(_ lineBreak: LineBreak) async -> Result
+
+    /// Visit a `Link` element and return the result.
+    /// - parameter link: A `Link` element.
+    /// - returns: The result of the visit.
+    func visitLink(_ link: Link) async -> Result
+
+    /// Visit a `SoftBreak` element and return the result.
+    /// - parameter softBreak: A `SoftBreak` element.
+    /// - returns: The result of the visit.
+    func visitSoftBreak(_ softBreak: SoftBreak) async -> Result
+
+    /// Visit a `Strong` element and return the result.
+    /// - parameter strong: A `Strong` element.
+    /// - returns: The result of the visit.
+    func visitStrong(_ strong: Strong) async -> Result
+
+    /// Visit a `Text` element and return the result.
+    /// - parameter text: A `Text` element.
+    /// - returns: The result of the visit.
+    func visitText(_ text: Text) async -> Result
+
+    /// Visit a `Strikethrough` element and return the result.
+    /// - parameter strikethrough: A `Strikethrough` element.
+    /// - returns: The result of the visit.
+    func visitStrikethrough(_ strikethrough: Strikethrough) async -> Result
+
+    /// Visit a `Table` element and return the result.
+    /// - parameter table: A `Table` element.
+    /// - returns: The result of the visit.
+    func visitTable(_ table: Table) async -> Result
+
+    /// Visit a `Table.Head` element and return the result.
+    /// - parameter tableHead: A `Table.Head` element.
+    /// - returns: The result of the visit.
+    func visitTableHead(_ tableHead: Table.Head) async -> Result
+
+    /// Visit a `Table.Body` element and return the result.
+    /// - parameter tableBody: A `Table.Body` element.
+    /// - returns: The result of the visit.
+    func visitTableBody(_ tableBody: Table.Body) async -> Result
+
+    /// Visit a `Table.Row` element and return the result.
+    /// - parameter tableRow: A `Table.Row` element.
+    /// - returns: The result of the visit.
+    func visitTableRow(_ tableRow: Table.Row) async -> Result
+
+    /// Visit a `Table.Cell` element and return the result.
+    /// - parameter tableCell: A `Table.Cell` element.
+    /// - returns: The result of the visit.
+    func visitTableCell(_ tableCell: Table.Cell) async -> Result
+
+    /// Visit a `SymbolLink` element and return the result.
+    /// - parameter symbolLink: A `SymbolLink` element.
+    /// - returns: The result of the visit.
+    func visitSymbolLink(_ symbolLink: SymbolLink) async -> Result
+
+    /// Visit an `InlineAttributes` element and return the result.
+    /// - parameter attributes: An `InlineAttributes` element.
+    /// - returns: The result of the visit.
+    func visitInlineAttributes(_ attributes: InlineAttributes) async -> Result
+
+    /// Visit a `DoxygenDiscussion` element and return the result.
+    /// - parameter doxygenDiscussion: A `DoxygenDiscussion` element.
+    /// - returns: The result of the visit.
+    func visitDoxygenDiscussion(_ doxygenDiscussion: DoxygenDiscussion) async -> Result
+
+    /// Visit a `DoxygenNote` element and return the result.
+    /// - parameter doxygenNote: A `DoxygenNote` element.
+    /// - returns: The result of the visit.
+    func visitDoxygenNote(_ doxygenNote: DoxygenNote) async -> Result
+
+    /// Visit a `DoxygenAbstract` element and return the result.
+    /// - parameter doxygenAbstract: A `DoxygenAbstract` element.
+    /// - returns: The result of the visit.
+    func visitDoxygenAbstract(_ doxygenAbstract: DoxygenAbstract) async -> Result
+
+    /// Visit a `DoxygenParameter` element and return the result.
+    /// - parameter doxygenParam: A `DoxygenParameter` element.
+    /// - returns: The result of the visit.
+    func visitDoxygenParameter(_ doxygenParam: DoxygenParameter) async -> Result
+
+    /// Visit a `DoxygenReturns` element and return the result.
+    /// - parameter doxygenReturns: A `DoxygenReturns` element.
+    /// - returns: The result of the visit.
+    func visitDoxygenReturns(_ doxygenReturns: DoxygenReturns) async -> Result
+}
+
+extension AsyncMarkupVisitor {
+    /// Default implementation: call `acceptAsync` on the markup element,
+    /// dispatching into each leaf element's implementation, which then
+    /// dispatches to the correct async visit method.
+    public func visit(_ markup: Markup) async -> Result {
+        return await markup.acceptAsync(self)
+    }
+
+    public func visitBlockQuote(_ blockQuote: BlockQuote) async -> Result {
+        return await defaultVisit(blockQuote)
+    }
+
+    public func visitCodeBlock(_ codeBlock: CodeBlock) async -> Result {
+        return await defaultVisit(codeBlock)
+    }
+
+    public func visitCustomBlock(_ customBlock: CustomBlock) async -> Result {
+        return await defaultVisit(customBlock)
+    }
+
+    public func visitDocument(_ document: Document) async -> Result {
+        return await defaultVisit(document)
+    }
+
+    public func visitHeading(_ heading: Heading) async -> Result {
+        return await defaultVisit(heading)
+    }
+
+    public func visitThematicBreak(_ thematicBreak: ThematicBreak) async -> Result {
+        return await defaultVisit(thematicBreak)
+    }
+
+    public func visitHTMLBlock(_ html: HTMLBlock) async -> Result {
+        return await defaultVisit(html)
+    }
+
+    public func visitListItem(_ listItem: ListItem) async -> Result {
+        return await defaultVisit(listItem)
+    }
+
+    public func visitOrderedList(_ orderedList: OrderedList) async -> Result {
+        return await defaultVisit(orderedList)
+    }
+
+    public func visitUnorderedList(_ unorderedList: UnorderedList) async -> Result {
+        return await defaultVisit(unorderedList)
+    }
+
+    public func visitParagraph(_ paragraph: Paragraph) async -> Result {
+        return await defaultVisit(paragraph)
+    }
+
+    public func visitBlockDirective(_ blockDirective: BlockDirective) async -> Result {
+        return await defaultVisit(blockDirective)
+    }
+
+    public func visitInlineCode(_ inlineCode: InlineCode) async -> Result {
+        return await defaultVisit(inlineCode)
+    }
+
+    public func visitCustomInline(_ customInline: CustomInline) async -> Result {
+        return await defaultVisit(customInline)
+    }
+
+    public func visitEmphasis(_ emphasis: Emphasis) async -> Result {
+        return await defaultVisit(emphasis)
+    }
+
+    public func visitImage(_ image: Image) async -> Result {
+        return await defaultVisit(image)
+    }
+
+    public func visitInlineHTML(_ inlineHTML: InlineHTML) async -> Result {
+        return await defaultVisit(inlineHTML)
+    }
+
+    public func visitLineBreak(_ lineBreak: LineBreak) async -> Result {
+        return await defaultVisit(lineBreak)
+    }
+
+    public func visitLink(_ link: Link) async -> Result {
+        return await defaultVisit(link)
+    }
+
+    public func visitSoftBreak(_ softBreak: SoftBreak) async -> Result {
+        return await defaultVisit(softBreak)
+    }
+
+    public func visitStrong(_ strong: Strong) async -> Result {
+        return await defaultVisit(strong)
+    }
+
+    public func visitText(_ text: Text) async -> Result {
+        return await defaultVisit(text)
+    }
+
+    public func visitStrikethrough(_ strikethrough: Strikethrough) async -> Result {
+        return await defaultVisit(strikethrough)
+    }
+
+    public func visitTable(_ table: Table) async -> Result {
+        return await defaultVisit(table)
+    }
+
+    public func visitTableHead(_ tableHead: Table.Head) async -> Result {
+        return await defaultVisit(tableHead)
+    }
+
+    public func visitTableBody(_ tableBody: Table.Body) async -> Result {
+        return await defaultVisit(tableBody)
+    }
+
+    public func visitTableRow(_ tableRow: Table.Row) async -> Result {
+        return await defaultVisit(tableRow)
+    }
+
+    public func visitTableCell(_ tableCell: Table.Cell) async -> Result {
+        return await defaultVisit(tableCell)
+    }
+
+    public func visitSymbolLink(_ symbolLink: SymbolLink) async -> Result {
+        return await defaultVisit(symbolLink)
+    }
+
+    public func visitInlineAttributes(_ attributes: InlineAttributes) async -> Result {
+        return await defaultVisit(attributes)
+    }
+
+    public func visitDoxygenDiscussion(_ doxygenDiscussion: DoxygenDiscussion) async -> Result {
+        return await defaultVisit(doxygenDiscussion)
+    }
+
+    public func visitDoxygenNote(_ doxygenNote: DoxygenNote) async -> Result {
+        return await defaultVisit(doxygenNote)
+    }
+
+    public func visitDoxygenAbstract(_ doxygenAbstract: DoxygenAbstract) async -> Result {
+        return await defaultVisit(doxygenAbstract)
+    }
+
+    public func visitDoxygenParameter(_ doxygenParam: DoxygenParameter) async -> Result {
+        return await defaultVisit(doxygenParam)
+    }
+
+    public func visitDoxygenReturns(_ doxygenReturns: DoxygenReturns) async -> Result {
+        return await defaultVisit(doxygenReturns)
+    }
+}
