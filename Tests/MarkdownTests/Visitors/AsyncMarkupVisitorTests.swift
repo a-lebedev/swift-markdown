@@ -322,4 +322,154 @@ final class AsyncMarkupVisitorTests: XCTestCase {
         // We should have some cache hits from the second code block being the same
         XCTAssertGreaterThan(stats.hits + stats.misses, 0)
     }
+
+    // MARK: - Every Element Kind Tests
+
+    /// A `Document` that has every kind of element in it at least once,
+    /// including the ones that require parse options or can only be constructed in code.
+    static let everyElementKindDocument: Document = {
+        let parsed = Document(parsing: """
+        # Heading
+
+        *emphasis* **strong** ~~strikethrough~~ `inline code` [link](https://example.com) ![image](image.png) ``symbol`` ^[attributed](rainbow: 'extreme') <b>inline html</b>
+        line\("  ")
+        break
+        soft
+        break
+
+        > Block quote
+
+        - unordered
+
+        1. ordered
+
+        ```swift
+        let x = 1
+        ```
+
+        <div>
+        HTML block
+        </div>
+
+        ---
+
+        | Column |
+        | ------ |
+        | Cell   |
+
+        @Directive {
+          Directive content
+        }
+
+        \\abstract An abstract.
+
+        \\discussion A discussion.
+
+        \\note A note.
+
+        \\param x A parameter.
+
+        \\returns A return value.
+        """, options: [.parseBlockDirectives, .parseSymbolLinks, .parseMinimalDoxygen])
+
+        let custom = CustomBlock([Paragraph(CustomInline("custom inline"))])
+        return Document(Array(parsed.blockChildren) + [custom])
+    }()
+
+    /// Test that the fixture really covers every kind of element.
+    func testEveryElementKindDocumentCoversAllKinds() {
+        func kinds(in markup: Markup) -> Set<String> {
+            var result: Set<String> = [String(describing: type(of: markup))]
+            for child in markup.children {
+                result.formUnion(kinds(in: child))
+            }
+            return result
+        }
+
+        XCTAssertEqual(kinds(in: Self.everyElementKindDocument), [
+            "BlockQuote", "CodeBlock", "CustomBlock", "Document", "Heading", "ThematicBreak",
+            "HTMLBlock", "ListItem", "OrderedList", "UnorderedList", "Paragraph", "BlockDirective",
+            "InlineCode", "CustomInline", "Emphasis", "Image", "InlineHTML", "LineBreak", "Link",
+            "SoftBreak", "Strong", "Text", "Strikethrough", "Table", "Head", "Body", "Row", "Cell",
+            "SymbolLink", "InlineAttributes", "DoxygenDiscussion", "DoxygenNote", "DoxygenAbstract",
+            "DoxygenParameter", "DoxygenReturns",
+        ])
+    }
+
+    /// Test that every element is visited via a customization of each async visit method.
+    func testAsyncVisitsEveryElement() async {
+        actor CountActor {
+            var count = 0
+            func increment() {
+                count += 1
+            }
+            func getCount() -> Int {
+                return count
+            }
+        }
+
+        struct AsyncCountEveryElement: AsyncMarkupWalker {
+            let counter: CountActor
+
+            private func count(_ markup: Markup) async {
+                await counter.increment()
+                await descendInto(markup)
+            }
+
+            func visitBlockQuote(_ blockQuote: BlockQuote) async { await count(blockQuote) }
+            func visitCodeBlock(_ codeBlock: CodeBlock) async { await count(codeBlock) }
+            func visitCustomBlock(_ customBlock: CustomBlock) async { await count(customBlock) }
+            func visitDocument(_ document: Document) async { await count(document) }
+            func visitHeading(_ heading: Heading) async { await count(heading) }
+            func visitThematicBreak(_ thematicBreak: ThematicBreak) async { await count(thematicBreak) }
+            func visitHTMLBlock(_ html: HTMLBlock) async { await count(html) }
+            func visitListItem(_ listItem: ListItem) async { await count(listItem) }
+            func visitOrderedList(_ orderedList: OrderedList) async { await count(orderedList) }
+            func visitUnorderedList(_ unorderedList: UnorderedList) async { await count(unorderedList) }
+            func visitParagraph(_ paragraph: Paragraph) async { await count(paragraph) }
+            func visitBlockDirective(_ blockDirective: BlockDirective) async { await count(blockDirective) }
+            func visitInlineCode(_ inlineCode: InlineCode) async { await count(inlineCode) }
+            func visitCustomInline(_ customInline: CustomInline) async { await count(customInline) }
+            func visitEmphasis(_ emphasis: Emphasis) async { await count(emphasis) }
+            func visitImage(_ image: Image) async { await count(image) }
+            func visitInlineHTML(_ inlineHTML: InlineHTML) async { await count(inlineHTML) }
+            func visitLineBreak(_ lineBreak: LineBreak) async { await count(lineBreak) }
+            func visitLink(_ link: Link) async { await count(link) }
+            func visitSoftBreak(_ softBreak: SoftBreak) async { await count(softBreak) }
+            func visitStrong(_ strong: Strong) async { await count(strong) }
+            func visitText(_ text: Text) async { await count(text) }
+            func visitStrikethrough(_ strikethrough: Strikethrough) async { await count(strikethrough) }
+            func visitTable(_ table: Table) async { await count(table) }
+            func visitTableHead(_ tableHead: Table.Head) async { await count(tableHead) }
+            func visitTableBody(_ tableBody: Table.Body) async { await count(tableBody) }
+            func visitTableRow(_ tableRow: Table.Row) async { await count(tableRow) }
+            func visitTableCell(_ tableCell: Table.Cell) async { await count(tableCell) }
+            func visitSymbolLink(_ symbolLink: SymbolLink) async { await count(symbolLink) }
+            func visitInlineAttributes(_ attributes: InlineAttributes) async { await count(attributes) }
+            func visitDoxygenDiscussion(_ doxygenDiscussion: DoxygenDiscussion) async { await count(doxygenDiscussion) }
+            func visitDoxygenNote(_ doxygenNote: DoxygenNote) async { await count(doxygenNote) }
+            func visitDoxygenAbstract(_ doxygenAbstract: DoxygenAbstract) async { await count(doxygenAbstract) }
+            func visitDoxygenParameter(_ doxygenParam: DoxygenParameter) async { await count(doxygenParam) }
+            func visitDoxygenReturns(_ doxygenReturns: DoxygenReturns) async { await count(doxygenReturns) }
+        }
+
+        let document = Self.everyElementKindDocument
+        let counter = CountActor()
+        let walker = AsyncCountEveryElement(counter: counter)
+        await walker.visit(document)
+        let count = await counter.getCount()
+        XCTAssertEqual(document.subtreeCount, count)
+    }
+
+    /// Test that an async rewriter which makes no modifications results in the same document
+    func testAsyncNullRewriter() async {
+        struct AsyncNullMarkupRewriter: AsyncMarkupRewriter {}
+
+        let document = Self.everyElementKindDocument
+        let rewriter = AsyncNullMarkupRewriter()
+        let shouldBeSame = await rewriter.visit(document) as? Document
+
+        XCTAssertNotNil(shouldBeSame)
+        XCTAssertEqual(document.debugDescription(), shouldBeSame?.debugDescription())
+    }
 }
